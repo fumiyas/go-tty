@@ -14,13 +14,13 @@ type Termios syscall.Termios
 func GetTermios(file *os.File) (Termios, error) {
 	var termios Termios
 
-	_, _, errno := syscall.Syscall(
+	r, _, errno := syscall.Syscall(
 		syscall.SYS_IOCTL,
 		file.Fd(),
 		uintptr(ioctlGetTermios),
 		uintptr(unsafe.Pointer(&termios)))
 
-	if errno != 0 {
+	if int(r) == -1 {
 		return termios, fmt.Errorf("ioctl failed: %s", syscall.Errno(errno).Error())
 	}
 
@@ -28,13 +28,13 @@ func GetTermios(file *os.File) (Termios, error) {
 }
 
 func SetTermios(file *os.File, termios Termios) error {
-	_, _, errno := syscall.Syscall(
+	r, _, errno := syscall.Syscall(
 		syscall.SYS_IOCTL,
 		file.Fd(),
 		uintptr(ioctlSetTermios),
 		uintptr(unsafe.Pointer(&termios)))
 
-	if errno != 0 {
+	if int(r) == -1 {
 		return fmt.Errorf("ioctl failed: %s", syscall.Errno(errno).Error())
 	}
 
